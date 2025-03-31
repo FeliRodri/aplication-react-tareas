@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
-import TareaFormulario from './TareaFormulario';
-import Tarea from './Tarea';
+import React, { useEffect, useState } from 'react';
 import '../hojas-de-estilo/ListaDeTareas.css';
+import Tarea from './Tarea';
+import TareaFormulario from './TareaFormulario';
 
 function ListaDeTareas() {
 
-    const [tareas, setTareas] = useState([]);
+    const [tareas, setTareas] = useState(() => {
+        const tareasGuardadas = localStorage.getItem('tareas');
+        if (tareasGuardadas) {
+            return JSON.parse(tareasGuardadas);
+        } else {
+            return [];
+        }
+    });
+
+    useEffect(() => {
+        localStorage.setItem('tareas', JSON.stringify(tareas));
+    }, [tareas]);
 
     const agregarTarea = tarea => {
         if (tarea.texto.trim()) {
@@ -32,19 +43,19 @@ function ListaDeTareas() {
 
     return (
         <>
-            <TareaFormulario onSubmit={agregarTarea}/>
+            <TareaFormulario onSubmit={agregarTarea} />
             <div className='tareas-lista-contenedor'>
-              {
-                tareas.map((tarea) =>
-                    <Tarea 
-                        key={tarea.id}
-                        id={tarea.id}
-                        texto={tarea.texto}
-                        completada={tarea.completada}
-                        completarTarea={completarTarea}
-                        eliminarTarea={eliminarTarea} />
-                )
-              } 
+                {
+                    tareas.map((tarea) =>
+                        <Tarea
+                            key={tarea.id}
+                            id={tarea.id}
+                            texto={tarea.texto}
+                            completada={tarea.completada}
+                            completarTarea={completarTarea}
+                            eliminarTarea={eliminarTarea} />
+                    )
+                }
             </div>
         </>
     )
